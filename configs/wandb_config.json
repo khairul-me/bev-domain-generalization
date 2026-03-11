@@ -1,0 +1,25 @@
+{
+  "project": "bev-domain-generalization",
+  "entity": null,
+  "tags": [
+    "bev-detection",
+    "domain-adaptation",
+    "depth-anything-v2"
+  ],
+  "notes": "Domain-Generalizable Camera-Only BEV 3D Detection via Foundation Depth Priors",
+  "config": {
+    "model": "BEVFormer-Tiny-fp16",
+    "backbone": "ResNet-50",
+    "depth_prior": "Depth-Anything-V2-ViT-S",
+    "adapter_channels": 256,
+    "dataset_train": "nuScenes-v1.0-trainval",
+    "dataset_eval": [
+      "nuScenes-val",
+      "KITTI-3D"
+    ],
+    "total_epochs": 24,
+    "batch_size": 1,
+    "lr": 0.0002,
+    "fp16": true
+  }
+}
