@@ -1,0 +1,10 @@
+# bev_research .gitignore
+data/
+*.pth
+*.pkl
+*.log
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+experiments/*/results_*.pkl
+wandb/
