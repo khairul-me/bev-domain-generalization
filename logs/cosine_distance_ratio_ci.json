@@ -1,0 +1,36 @@
+{
+  "bev_embed": {
+    "cross_city_cosine": 0.8899411922221623,
+    "within_boston_cosine": 0.902884284308097,
+    "cross_city_dist": 0.11005880777783772,
+    "within_boston_dist": 0.09711571569190303,
+    "ratio": 1.1332749493088874,
+    "ratio_ci_95": [
+      1.1005634419734225,
+      1.166588477670962
+    ],
+    "cross_dist_ci_95": [
+      0.1082942581312738,
+      0.11186203110857809
+    ],
+    "within_dist_ci_95": [
+      0.09474593261680479,
+      0.09952849748540744
+    ],
+    "perm_test_p": 0.0,
+    "method": "CAM_FRONT 8x8 pooled (npz cache, consistent for both comparisons)"
+  },
+  "img_feat": {
+    "cross_city_cosine": 0.6932935022599408,
+    "within_boston_cosine": 0.7206855604233969,
+    "cross_city_dist": 0.3067064977400592,
+    "within_boston_dist": 0.27931443957660307,
+    "ratio": 1.0980688939854961,
+    "ratio_ci_95": [
+      1.064208572594819,
+      1.135353382458165
+    ],
+    "perm_test_p": 0.0,
+    "method": "CAM_FRONT 8x8 pooled (npz cache) \u2014 NOTE: primary paper cosine 0.424 uses 6-camera full-spatial method"
+  }
+}
