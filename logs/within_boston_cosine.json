@@ -1,0 +1,18 @@
+{
+  "cross_city": {
+    "img_feat_cosine_mean": 0.6932935118675232,
+    "img_feat_cosine_std": 0.05667722225189209,
+    "bev_embed_cosine_mean": 0.8899411559104919,
+    "bev_embed_cosine_std": 0.019414974376559258
+  },
+  "within_boston": {
+    "img_feat_cosine_mean": 0.7206855416297913,
+    "img_feat_cosine_std": 0.06454084813594818,
+    "bev_embed_cosine_mean": 0.902884304523468,
+    "bev_embed_cosine_std": 0.01871984638273716
+  },
+  "cosine_distance_ratio": {
+    "bev_embed": 1.1332755591098433,
+    "img_feat": 1.0980687857051858
+  }
+}

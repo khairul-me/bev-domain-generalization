@@ -24,27 +24,32 @@ city-level shift.
 We establish a controlled Boston$\to$Singapore evaluation protocol on the nuScenes
 dataset --- identical sensors, same annotation pipeline, different cities ---
 and measure a $-5.84$ mAP / $-9.25$ NDS gap at the frozen baseline.
-Through layer-wise representation analysis we show this gap originates at the image
-feature level (mean img\_feat cosine similarity $0.424$) and is partially normalized
-by the BEV transformer encoder: cosine similarity rises to $0.890$ ($81\%$ per-frame
-normalization).
-Debiased Linear CKA (PCA-100) is near zero at all layers and in both within-city
-and cross-city comparisons, indicating frame-to-frame scene variability dominates
-structural geometry --- CKA is not a reliable discriminator of the domain gap at this
-sample size and dimensionality.
-The t-SNE analysis of BEV encoder features (cross-city drift ratio $= 1.30$)
-provides the stronger structural evidence that city-level separation persists.
+The trailer class, absent from the Singapore validation split, accounts for
+$-0.157$ of the total gap; excluding trailer the 9-class mAP gap is $-4.75$
+($-10.4\%$ relative), confirming a genuine visual-domain contribution.
+Through layer-wise representation analysis we show the gap originates at the image
+feature level (per-camera cosine similarity $0.424$) and is largely normalized by
+direction by the BEV transformer encoder (cosine rises to $0.890$, $81\%$ of the
+maximum possible increase toward unity).
+Cosine similarity measures directional alignment; a complementary structural metric
+confirms the gap persists: the cross-city \texttt{bev\_embed} cosine distance is
+$13\%$ larger than within-Boston ($0.110$ vs.\ $0.097$).
+Debiased Linear CKA (PCA-100, $N{=}500$) is near zero in \emph{all} comparison
+types --- including within-city --- indicating scene heterogeneity dominates
+relational geometry; CKA cannot discriminate the domain gap from normal intra-city
+variation at this scale and is used here as a null-result probe, not as gap evidence.
 Foundation monocular depth features from Depth Anything V2 (ViT-S) are significantly
 more domain-stable across cities (depth-scale Cohen's~$d = 0.09$), motivating their
 use as a geometric prior for domain bridging.
-We systematically evaluate \textbf{six} adapter designs for injecting this stable prior into
-a frozen BEVFormer and find all fail for principled, distinct reasons:
+We systematically evaluate \textbf{six} adapter designs for injecting this stable
+prior into a frozen BEVFormer and find all fail for principled, distinct reasons:
 detection loss drives frozen adapters toward zero output (E3-A/B, replicated with
-96-channel depth-scale-only injection in E6), simulated appearance
-augmentation does not capture real city-level shift, partial encoder unfreezing
-degrades calibration of the frozen detection head (NDS $-34\%$), and target-domain
-pseudo-label supervision creates a circular optimization that reinforces model biases
-(E5: mAP $0.360$ vs.\ baseline $0.367$ on Singapore).
+96-channel depth-scale-only injection in E6), simulated appearance augmentation does
+not capture real city-level shift, partial encoder unfreezing degrades calibration of
+the frozen detection head (NDS $-34\%$), and target-domain pseudo-label supervision
+creates a self-referential optimization that reinforces source-domain biases, an
+instance of the degenerate pseudo-labeling mode identified for 2D SFDA but here
+manifesting in structured 3D box regression (E5: mAP $0.360$ vs.\ baseline $0.367$).
 Our analysis identifies the specific conditions required for foundation depth priors
 to improve camera BEV domain generalization, and provides a clean, reproducible
 evaluation protocol for future work.
@@ -79,27 +84,27 @@ building facades, lighting conditions, and traffic patterns.
 Our first contribution is to run this experiment carefully and report the result:
 a $-5.84$ mAP / $-9.25$ NDS gap (\cref{tab:gap}), with the model trained on Boston
 and evaluated on Singapore.
-This is not a novel observation --- practitioners know the gap exists --- but it has
-not been reported as a clean, reproducible number with a verified pipeline.
+We also foreground a confound: trailer collapses to $0$ AP in Singapore due to
+class-distribution shift unrelated to visual appearance; excluding trailer the
+9-class mAP gap is $-4.75$ ($-10.4\%$), confirming a genuine appearance-driven
+component.
+This controlled gap measurement is not in the prior literature.
 
 Our second contribution is to localize \emph{where} this gap lives inside the model.
 We instrument BEVFormer with forward hooks at the FPN output (\texttt{img\_feat})
 and BEV encoder output (\texttt{bev\_embed}) and measure per-camera cosine similarity
-and Linear CKA~\cite{kornblith2019cka} between density-matched Boston--Singapore
-frame pairs ($N=500$).
-The results show a two-part normalization: cosine similarity rises from $0.424$ to
-$0.890$ ($81\%$ normalization), while debiased structural CKA increases only from
-$0.003$ to $0.009$ ($0.5\%$ normalization).
-The BEV encoder normalizes individual frame appearance but leaves the structural
-feature-space geometry almost entirely unchanged, and it is this structural gap that
-drives the detection degradation.
-A within-Boston CKA reference ($0.001$ at \texttt{img\_feat}) confirms that
-debiased CKA is near zero even within the source city, indicating high
-frame-to-frame scene heterogeneity --- CKA near zero is therefore not uniquely
-a cross-city signal, and the primary evidence for persistent separation rests on
-the $81\%$ cosine residual and the t-SNE drift ratio of $1.30$.
-A t-SNE analysis (\cref{sec:tsne}) confirms city-level separation persists at the
-BEV output (drift ratio $= 1.30$).
+between density-matched Boston--Singapore frame pairs ($N=500$).
+Cosine similarity rises from $0.424$ to $0.890$, closing $81\%$ of the gap to unity.
+We use debiased Linear CKA~\cite{kornblith2019cka} (PCA-100) as a \emph{null-result
+probe}: all CKA values are near zero regardless of comparison type, including
+within-Boston, indicating that scene heterogeneity dominates relational geometry at
+this scale --- CKA cannot discriminate the domain gap from normal intra-city variation.
+The structural evidence that separation \emph{persists} rests instead on a cosine
+distance comparison in the original feature space: cross-city \texttt{bev\_embed}
+cosine distance ($1 - \text{cosine}$) is $1.133\times$ the within-Boston baseline
+($0.110$ vs.\ $0.097$), confirming city-level separation after the BEV encoder's
+directional normalization.
+A t-SNE visualization (\cref{sec:tsne}) provides qualitative corroboration.
 
 Our third contribution is a systematic ablation of \textbf{six} injection strategies using
 Depth Anything V2 (DAv2)~\cite{yang2024depthanythingv2} features as the stable
@@ -234,8 +239,10 @@ Full val  & 0.405 & 0.500 & --    & --    & --    & --    & --    \\
 Boston    & 0.425 & 0.524 & 0.666 & 0.280 & 0.321 & 0.461 & 0.157 \\
 Singapore & 0.367 & 0.431 & 0.726 & 0.354 & 0.472 & 0.615 & 0.353 \\
 \midrule
-\textbf{Gap} & \textbf{$-$5.8} & \textbf{$-$9.3} & $+$0.060 & $+$0.074
+\textbf{Gap (10 cls)} & \textbf{$-$5.8} & \textbf{$-$9.3} & $+$0.060 & $+$0.074
              & $+$0.151 & $+$0.154 & $+$0.196 \\
+\textbf{Gap (9 cls, excl.\ trailer)$^{\S}$} & \textbf{$-$4.8} & -- & -- & --
+             & -- & -- & -- \\
 \multicolumn{2}{@{}l}{\small 95\% CI on mAP gap (\textit{N}=10 cls, bootstrap)}
   & \multicolumn{6}{l@{}}{\small $[-20.7,\ +8.8]$;\; $p{=}0.003$ (paired $t$),\; $p{=}0.004$ (Wilcoxon)$^{\ddagger}$} \\
 \bottomrule
@@ -250,27 +257,41 @@ pairing information across cities and confirm the gap is significant at
 $\alpha{=}0.01$ despite the wide CI.
 The apparent contradiction --- CI includes zero yet $p{<}0.01$ --- is a well-known
 consequence of the power difference between non-parametric bootstrap ($N{=}10$)
-and paired parametric tests.}
+and paired parametric tests.
+$^{\S}$Trailer AP collapses to $0.000$ in Singapore due to class-distribution
+shift (trailer is absent from Singapore-OneNorth validation scenes), not visual
+appearance shift. Excluding trailer: Boston-9 mAP\,$= 0.455$, Singapore-9
+mAP\,$= 0.407$, gap\,$= -0.048$ ($-10.4\%$ relative).}
 
 The gap of $-5.84$ mAP is substantial but not catastrophic.
 More revealing is the error breakdown: translation error (mATE) worsens by only
-$0.060$ m, while orientation (mAOE $+0.151$ rad), velocity (mAVE $+0.154$ m/s),
-and attribute (mAAE $+0.196$) errors worsen by $47\%$, $33\%$, and $125\%$
-respectively.
-The model finds objects at roughly correct locations in Singapore but is poorly
-calibrated for their motion and orientation in that city's traffic context.
-This is consistent with a feature-level appearance shift that degrades the fine-grained
-cues used for attribute prediction more than the coarse spatial cues used for
-localization.
+$0.060$ m ($+9\%$), while size estimation (mASE $+0.074$, $+26\%$), orientation
+(mAOE $+0.151$ rad, $+47\%$), velocity (mAVE $+0.154$ m/s, $+33\%$), and attribute
+(mAAE $+0.196$, $+125\%$) errors all degrade substantially.
+The model localizes objects at roughly correct positions in Singapore but is poorly
+calibrated for their geometry, motion, and semantic attributes in that city's context.
+The size error degradation (mASE $+26\%$) is noteworthy: box size estimation should
+be largely appearance-independent, yet it worsens considerably.
+A plausible explanation is that Singapore has a different vehicle-type mix than Boston
+(e.g., smaller taxis, different bus dimensions), so the per-class size priors the model
+has internalized from Boston training do not transfer, causing systematic scale
+miscalibration rather than pure appearance confusion.
+The calibration-decoupling interpretation (fine-grained attribute cues shift more than
+coarse localization cues) therefore applies to size as well as orientation and velocity.
 
 \Cref{tab:perclass} breaks the mAP gap down per class.
-The trailer category collapses entirely ($-100\%$ relative), confirming that
-rare-class performance is most vulnerable to domain shift.
-Construction vehicles ($-20.8\%$) and bicycles ($-18.0\%$) also suffer heavily,
-suggesting that visually unusual or pose-diverse objects are the primary
-failure mode.
+\textbf{Trailer collapses entirely ($-100\%$), but this is a class-distribution
+confound: Singapore-OneNorth validation scenes contain essentially no trailers,
+so the model makes no correct detections regardless of domain shift.}
+Excluding trailer, the mean 9-class relative gap is $-10.4\%$ --- still significant
+but substantially less dramatic than the $-13.7\%$ headline.
+This number should be interpreted as the \emph{visual} domain gap; it is the figure
+most relevant for understanding how much appearance shift alone affects detection.
+Construction vehicles ($-20.8\%$) and bicycles ($-18.0\%$) also suffer heavily:
+both classes rely on fine-grained appearance cues that differ substantially across
+cities.
 Notably, pedestrian AP slightly \emph{improves} in Singapore ($+2.2\%$),
-likely reflecting denser urban footfall in Singapore's downtown district.
+likely reflecting denser urban footfall in Singapore-OneNorth's downtown district.
 
 \begin{table}[h]
 \centering
@@ -300,67 +321,91 @@ pedestrian             & 0.482 & 0.492 & $+$0.011 &   $+$2.2\,\% \\
 \subsection{Layer-wise Representation Analysis}
 
 To localize where the gap lives inside the model, we instrument BEVFormer with
-PyTorch forward hooks at two points and measure both cosine similarity and
+PyTorch forward hooks at two points and measure cosine similarity and
 Linear CKA~\cite{kornblith2019cka} between density-matched Boston--Singapore frame
 pairs ($N=500$, density bucketing to control for scene composition).
 
+\textbf{What each metric measures.}
+These two metrics are \emph{not interchangeable} and tell different stories.
+\emph{Cosine similarity} measures directional alignment: two feature vectors
+with the same direction in high-dimensional space score $1.0$ regardless of their
+relational structure within the dataset.
+\emph{Debiased Linear CKA} measures relational geometry: it compares the
+pairwise similarity structure of the Boston feature set with the pairwise similarity
+structure of the Singapore feature set --- two sets can be perfectly cosine-similar
+yet have CKA $\approx 0$ if the \emph{ordering} of feature relationships differs.
+A rise in cosine from $0.424$ to $0.890$ therefore tells us the BEV encoder makes
+individual Boston and Singapore embeddings co-directional; it says nothing about
+whether the relational geometry of the two sets has been equalized.
+This distinction is stated \emph{before} the results because both metrics are
+reported, and they must not be treated as measuring the same property.
+
+\textbf{Methodological note.}
+All representation analysis uses single-frame inference (temporal queue reset), while
+detection evaluation uses the full temporal queue ($T{=}4$).
+Single-frame inference isolates the image-level representation from temporal smoothing.
+The cosine/CKA values therefore describe a conservative lower bound on feature
+similarity: temporal context in the full model would further align BEV embeddings
+across repeated scenes, so the actual per-frame structural gap at inference time is
+likely no larger than reported here.
+
 \begin{itemize}
   \item \textbf{img\_feat} (after FPN, before BEV encoder): mean cosine similarity
-        $\mathbf{0.424 \pm 0.033}$ across pairs, Linear CKA\,=\,$0.114$
-        (\cref{tab:drift}).
+        $\mathbf{0.424 \pm 0.033}$ across pairs (\cref{tab:drift}).
   \item \textbf{bev\_embed} (after BEV encoder): mean cosine similarity
-        $\mathbf{0.890 \pm 0.019}$, Linear CKA\,=\,$0.139$.
+        $\mathbf{0.890 \pm 0.019}$; within-Boston $0.903 \pm 0.019$.
 \end{itemize}
 
 \begin{table}[h]
 \centering
-\caption{Layer-wise representation similarity between density-matched
-  Boston--Singapore frame pairs ($N=500$).
-  Cosine similarity is computed per-camera over full spatial feature maps;
-  debiased CKA (Kornblith et al.~\citeyear{kornblith2019cka}, Supp.) is applied
-  after PCA to 100\,D (70.6\,\% variance retained for \texttt{img\_feat},
-  68.1\,\% for \texttt{bev\_embed}).
-  A within-Boston reference row ($N=250$ pairs, same methodology) establishes
-  the baseline frame-to-frame structural variability within the source city.
-  Both cross-city CIs and within-city CIs verified to contain the point estimate.
-  $^{\dagger}$2000 iterations, 80\,\% subsampling without replacement.}
+\caption{Layer-wise representation similarity.
+  Cross-city: $N{=}500$ density-matched Boston--Singapore pairs.
+  Within-Boston: $N{=}250$ pairs (shuffled halves of the 500 Boston features).
+  Cosine similarity computed per-camera over full spatial feature maps;
+  debiased CKA (Kornblith et al.~\citeyear{kornblith2019cka}, Supp.) applied
+  after PCA-100\,D (70.6\,\% variance, \texttt{img\_feat}; 68.1\,\%, \texttt{bev\_embed}).
+  Within-Boston cosine from CAM\_FRONT 8$\times$8 pooled features (consistent with
+  CKA basis); cross-city cosine from per-camera spatial method.
+  $^{\dagger}$2000 bootstrap iterations, 80\,\% subsampling without replacement.}
 \label{tab:drift}
-\begin{tabular}{@{}lcccccc@{}}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-Comparison & Cos.\,$\mu$ & Cos.\,$\sigma$ & Cos.\,norm. & CKA (biased) & CKA (debiased) & 95\,\%\,CI$^{\dagger}$ \\
+Comparison & Cos.\,$\mu$ & Cos.\,dist & CKA (debiased) & 95\,\%\,CI$^{\dagger}$ \\
 \midrule
-\multicolumn{7}{@{}l}{\textit{After FPN (\texttt{img\_feat})}} \\
-\quad Cross-city Boston$\to$Singapore
-  & 0.424 & 0.033 & --   & 0.114 & 0.003 & $[-0.001,\ 0.007]$ \\
-\quad Within-Boston (reference)
-  & --    & --    & --   & --    & 0.001 & $[-0.006,\ 0.009]$ \\
+\multicolumn{5}{@{}l}{\textit{After FPN (\texttt{img\_feat})}} \\
+\quad Cross-city Boston$\to$Singapore & 0.424 & 0.576 & 0.003 & $[-0.001,\ 0.007]$ \\
+\quad Within-Boston (reference)       & --    & --    & 0.001 & $[-0.006,\ 0.009]$ \\
 \midrule
-\multicolumn{7}{@{}l}{\textit{After BEV encoder (\texttt{bev\_embed})}} \\
-\quad Cross-city Boston$\to$Singapore
-  & 0.890 & 0.019 & 81\% & 0.139 & 0.009 & $[\ 0.004,\ 0.014]$ \\
-\quad Within-Boston (reference)
-  & --    & --    & --   & --    & $-$0.003 & $[-0.010,\ 0.003]$ \\
+\multicolumn{5}{@{}l}{\textit{After BEV encoder (\texttt{bev\_embed})}} \\
+\quad Cross-city Boston$\to$Singapore & 0.890 & 0.110 & 0.009 & $[\ 0.004,\ 0.014]$ \\
+\quad Within-Boston (reference)       & 0.903 & 0.097 & $-$0.003 & $[-0.010,\ 0.003]$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The two metrics tell complementary stories about the domain gap.
-\textbf{Cosine similarity} rises from $0.424$ to $0.890$ ($81\%$ normalization), showing the BEV
-encoder makes individual Boston and Singapore embeddings strongly co-directional.
-\textbf{Debiased CKA} reveals a different picture: all values are near zero regardless of
-comparison type (cross-city \texttt{img\_feat}: $0.003$; within-Boston \texttt{img\_feat}: $0.001$;
-cross-city \texttt{bev\_embed}: $0.009$; within-Boston \texttt{bev\_embed}: $-0.003$), indicating
-that feature-space structural geometry is highly heterogeneous at the frame level, dominated
-by scene-content variability rather than city identity.
-This null result is itself informative: the domain gap does not manifest as a detectable
-\emph{difference} in CKA between within-city and cross-city comparisons at the image feature level.
-However, at the BEV encoder output, the cross-city CKA ($0.009$, CI $[0.004, 0.014]$, zero excluded)
-becomes weakly positive while within-Boston CKA remains indistinguishable from zero
-(CI $[-0.010, 0.003]$, zero included), suggesting the BEV encoder imposes a shared
-structural alignment between the two cities that does not emerge from same-city frame comparisons.
-The primary evidence for persistent city-level separation therefore rests on the
-cosine similarity analysis ($81\%$ normalization leaving a measurable appearance residual)
-and the t-SNE drift ratio (\cref{sec:tsne}).
+\textbf{Cosine similarity} rises from $0.424$ to $0.890$, closing $81\%$ of the gap
+to unity ($= (0.890{-}0.424)/(1{-}0.424)$).
+This framing measures how much of the directional alignment gap is closed; it does not
+claim the BEV encoder closes $81\%$ of the structural domain gap.
+\textbf{Cosine distance} ($1 -$ cosine) at the BEV encoder output is $0.110$ for
+cross-city pairs vs.\ $0.097$ for within-Boston pairs --- a ratio of $1.133\times$.
+City-level separation is therefore confirmed in the original high-dimensional feature
+space by a metric that does not suffer from t-SNE projection artifacts.
+\textbf{Debiased CKA} is near zero in all comparison types:
+cross-city \texttt{img\_feat}: $0.003$ (CI includes zero);
+within-Boston \texttt{img\_feat}: $0.001$ (CI includes zero);
+cross-city \texttt{bev\_embed}: $0.009$ (CI $[0.004, 0.014]$, zero excluded);
+within-Boston \texttt{bev\_embed}: $-0.003$ (CI includes zero).
+Since within-city CKA is statistically indistinguishable from cross-city CKA at the
+image feature level, CKA cannot serve as a domain gap discriminator here --- the
+null result reflects high scene heterogeneity, not measurement failure.
+The one informative CKA finding is the \texttt{bev\_embed} cross-city value
+($0.009$, CI excludes zero), weakly positive while within-Boston is not, suggesting
+the BEV encoder imposes a shared structural alignment across cities absent within
+a single city.
+The primary structural evidence for persistent separation rests on the cosine distance
+ratio ($1.133\times$) and the t-SNE visualization (\cref{sec:tsne}).
 
 This localization has a direct architectural implication: interventions that operate
 \emph{after} the BEV encoder (e.g., BEV-level domain alignment as in DA-BEV) are
@@ -368,31 +413,38 @@ working on features that are already cosine-similar but structurally misaligned.
 Interventions that operate \emph{before} the BEV encoder --- on image features ---
 have access to the full structural gap signal.
 
-\subsection{BEV Feature Space Drift (t-SNE)}
+\subsection{BEV Feature Space Drift (t-SNE Visualization)}
 \label{sec:tsne}
 
-To verify that the BEV-level normalization does not fully collapse the city distinction,
-we extract \texttt{bev\_embed} vectors for 200 frames per city (400 total) and embed
-them with t-SNE ($\text{perplexity}=30$, $\text{max\_iter}=1000$).
-We measure the mean pairwise distance in the 2D embedding for cross-city pairs
-vs.\ within-city pairs (\cref{fig:tsne}).
+\cref{fig:tsne} shows a t-SNE embedding of \texttt{bev\_embed} vectors for
+200 frames per city (400 total, perplexity\,$=30$, max\_iter\,$=1000$).
+Partial separation between the Boston and Singapore clusters is visible.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.9\linewidth]{../figures/tsne_encoder_drift.pdf}
   \caption{t-SNE of BEV encoder features (200 Boston, 200 Singapore frames).
-    Partial separation is visible: the feature space is not fully city-agnostic.
-    Cross-domain distance = 2.13; within-city baseline = 1.64;
-    drift ratio = $\mathbf{1.30}$.}
+    Partial separation is visible, confirming the feature space is not
+    fully city-agnostic after the BEV encoder's directional normalization.
+    \emph{Note: t-SNE is a visualization tool; pairwise distances in the 2D
+    embedding do not reliably reflect distances in the original 256-D space.}
+    The quantitative structural evidence is reported in \cref{tab:drift}
+    (cross-city cosine distance $1.133\times$ within-city).}
   \label{fig:tsne}
 \end{figure}
 
-The drift ratio of $1.30$ (cross-domain distance $1.30\times$ the within-domain baseline)
-confirms that even after the BEV encoder's $81\%$ cosine normalization, the feature space
-retains a statistically meaningful city-level separation.
-This is consistent with the ``calibration decoupling'' hypothesis: the BEV encoder
-normalizes gross appearance differences but does not fully bridge the remaining
-fine-grained domain gap responsible for the $-5.84$ mAP degradation.
+t-SNE intentionally does not preserve global distances or density faithfully in
+two dimensions; pairwise distances in the projection are therefore not a valid
+structural metric.
+The \emph{quantitative} evidence for persistent separation is the cosine distance
+ratio from \cref{tab:drift}: cross-city \texttt{bev\_embed} cosine distance is
+$1.133\times$ the within-Boston baseline ($0.110$ vs.\ $0.097$ in the original
+feature space).
+The t-SNE figure serves as qualitative corroboration of that finding.
+Together, these observations support the ``calibration decoupling'' hypothesis:
+the BEV encoder normalizes gross directional appearance differences but does not
+fully collapse the city-level distributional separation, leaving the detection head
+seeing a measurably different feature distribution for Singapore traffic.
 
 \subsection{DAv2 Depth Feature Stability}
 
@@ -474,13 +526,15 @@ instead of all 384 channels, reducing trainable parameters from 164\,K to 91\,K.
 \begin{table*}[t]
 \centering
 \caption{Adapter ablation results. All models start from the frozen BEVFormer-Base
-  baseline. Singapore mAP/NDS are evaluated on the 2{,}929-sample Singapore split.
+  baseline. Singapore mAP/NDS evaluated on the 2{,}929-sample Singapore split.
   ``Identical'' denotes match to baseline at four decimal places.
   E5 uses target-domain pseudo-labels ($\tau=0.3$, 50{,}134 boxes from the frozen baseline)
   and trains only the adapter weights; all four epochs degrade vs.\ baseline.
-  E6 uses only 96 depth-scale-invariant DAv2 channels; Singapore results are
-  identical to baseline at four decimal places, confirming the zero-output local
-  optimum is independent of channel selection.}
+  E6 uses only 96 depth-scale-invariant DAv2 channels; Singapore results identical to
+  baseline, confirming the zero-output local optimum is independent of channel selection.
+  $^{\star}$E4 Singapore values obtained by running the epoch-4 checkpoint on the
+  Singapore split after training; catastrophic degradation on the full validation
+  (NDS $0.500 \to 0.331$) is driven by head calibration collapse visible here too.}
 \label{tab:ablation}
 \setlength{\tabcolsep}{6pt}
 \begin{tabular}{@{}llccccl@{}}
@@ -498,7 +552,7 @@ E3-B & $\alpha = 0.1$
 E3-C & $\alpha = 0.1$ + consistency loss
   & 0.405 & 0.500 & 0.367 & 0.431 & Augmentation $\neq$ real domain shift \\
 E4   & Partial unfreeze (encoder lr $= 10^{-5}$)
-  & 0.373 & 0.331 & -- & -- & Head calibration broken by encoder drift \\
+  & 0.373 & 0.331 & 0.307$^{\star}$ & 0.274$^{\star}$ & Head calibration broken by encoder drift \\
 \midrule
 E5   & Pseudo-label adapt.\ (Singapore, score $>0.3$)
   & -- & -- & 0.360 & 0.422 & Circular optimization (pseudo-labels encode model bias) \\
@@ -554,43 +608,54 @@ However, the full validation NDS collapses from $0.500$ to $0.331$ ($-34\%$) aft
 4 epochs on 2{,}000 Boston samples.
 The per-error breakdown shows mAOE degrading from $0.32$ to $1.22$ radians (effectively
 random orientation) and mASE from $0.28$ to $0.55$.
+Running the epoch-4 checkpoint on the Singapore split yields mAP $0.307$ / NDS $0.274$
+--- worse than both the baseline and E3-B --- confirming that the degradation is
+not a Boston-only artefact but a catastrophic collapse across both cities.
 The encoder learns new representations to accommodate the injected DAv2 features,
 but the frozen detection head, calibrated to the original encoder's output space,
 cannot interpret these new representations for fine-grained attribute prediction.
 With 2{,}000 training samples, the encoder drifts faster than the head can recalibrate
 --- in fact, the head is frozen and cannot recalibrate at all.
 
-\paragraph{E5 (pseudo-label adaptation): circular optimization.}
+\paragraph{E5 (pseudo-label adaptation): self-referential supervision.}
 E3-B established that Boston supervision alone is insufficient because it drives the
 adapter to zero output.
 E5 directly addresses this by providing target-domain detection supervision:
 the frozen BEVFormer is first run on all 2{,}929 Singapore validation frames to
-generate pseudo-labels (score threshold $\tau = 0.3$; $50{,}134$ boxes retained,
-avg.\ $17.1$ boxes/frame).
+generate pseudo-labels.
+We use score threshold $\tau = 0.3$ --- a permissive threshold that retains
+$50{,}134$ boxes ($17.1$/frame).
+A permissive threshold is appropriate here because the goal is to provide gradient
+signal across a wide range of Singapore detections, not to filter to high-purity
+positive examples; at $\tau = 0.5$ the box count would be approximately halved,
+reducing coverage without addressing the structural failure identified below.
 The adapter is then trained on Singapore pseudo-labeled frames with the BEVFormer
 backbone and detection head frozen, so only the adapter weights receive gradients.
 
 Unlike E3, \texttt{grad\_norm} is non-zero throughout training ($0.02 \to 0.13$
 over the first 150 iterations), confirming that pseudo-label detection loss provides
 a non-trivial gradient signal.
-However, the Singapore evaluation at each epoch tells a different story:
+However, the Singapore evaluation at each epoch shows:
 \emph{all four epochs are worse than the frozen baseline} (best epoch: mAP $0.360$,
 NDS $0.422$; baseline: mAP $0.367$, NDS $0.431$), with performance monotonically
 decreasing over training.
 
-The mechanism is \textbf{circular optimization}.
+The failure mechanism is \textbf{self-referential supervision}.
 The pseudo-labels are generated by the same frozen model that the adapter wraps.
 Training the adapter to minimize detection loss on these pseudo-labels is equivalent
 to asking the adapter to bring image features closer to the specific representations
 that the frozen backbone and head were pre-trained to process on Boston.
-This is precisely the opposite of domain adaptation: the gradient pushes FPN features
-toward the Boston-optimal manifold, not toward a Singapore-optimal one.
-The adapter learns to reinforce existing model biases rather than correct for
-the domain shift.
-This failure mode requires a supervision signal that is \emph{independent} of the
-model being adapted --- e.g., labels from an independent oracle, or a geometric
-consistency signal that cannot be trivially satisfied by reproducing the source-domain
-feature distribution.
+This is the opposite of domain adaptation: the gradient pushes FPN features
+toward the Boston-optimal manifold.
+The adapter reinforces existing source biases rather than correcting for city shift.
+This pattern --- degradation despite valid gradient flow --- is analogous to the
+degenerate pseudo-labeling mode analyzed for 2D source-free domain adaptation in
+SHOT~\cite{liang2021shot}; the distinction here is the structured 3D box regression
+setting, where pseudo-labels encode box size and orientation priors internalized from
+Boston, making self-referential collapse particularly severe.
+This failure mode requires a supervision signal that is genuinely \emph{independent}
+of the model being adapted: labels from an independent oracle, cross-modal geometric
+consistency, or structure-from-motion depth supervision.
 
 \noindent\textbf{Limitation note.}
 E5 trains and evaluates on the same 2{,}929 Singapore frames.
