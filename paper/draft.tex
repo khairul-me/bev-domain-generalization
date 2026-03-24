@@ -36,7 +36,8 @@ maximum possible increase toward unity).
 Cosine similarity measures directional alignment; a complementary structural metric
 confirms the gap persists: the cross-city \texttt{bev\_embed} cosine distance is
 $13\%$ larger than within-Boston ($0.110$ vs.\ $0.097$; ratio $1.133\times$,
-95\,\% CI $[1.101,\ 1.167]$, permutation $p < 0.001$).
+95\,\% CI $[1.101,\ 1.167]$, two-sample permutation $p < 0.001$;
+procedure defined in \cref{sec:repr}).
 Debiased Linear CKA (PCA-100, $N{=}500$) is near zero in \emph{all} comparison
 types --- including within-city --- indicating scene heterogeneity dominates
 relational geometry; CKA cannot discriminate the domain gap from normal intra-city
@@ -328,6 +329,7 @@ pedestrian             & 0.482 & 0.492 & $+$0.011 &   $+$2.2\,\% \\
 \end{table}
 
 \subsection{Layer-wise Representation Analysis}
+\label{sec:repr}
 
 To localize where the gap lives inside the model, we instrument BEVFormer with
 PyTorch forward hooks at two points and measure cosine similarity and
@@ -370,28 +372,30 @@ likely no larger than reported here.
 \caption{Layer-wise representation similarity.
   Cross-city: $N{=}500$ density-matched Boston--Singapore pairs.
   Within-Boston: $N{=}250$ pairs (shuffled halves of the 500 Boston features).
-  \texttt{bev\_embed} cosine: CAM\_FRONT 8$\times$8 pooled features for both
-  cross-city and within-Boston (consistent method; both give 0.890 cross-city).
-  \texttt{img\_feat} cross-city cosine (0.424): per-camera full-spatial method.
-  \texttt{img\_feat} within-Boston cosine$^{\ddagger}$: CAM\_FRONT 8$\times$8
-  pooled (not directly comparable to 0.424 for ratio computation; the
-  method-consistent img\_feat ratio is $0.307/0.279 = 1.098\times$, 95\,\% CI
-  $[1.064,\ 1.135]$, $p{<}0.001$).
+  \emph{Cos$_{6\mathrm{c}}$}: per-camera full-spatial cosine (cross-city only).
+  \emph{Cos$_{8{\times}8}$}: CAM\_FRONT 8${\times}$8 pooled cosine; used for both
+  cross-city and within-Boston to ensure method-consistent ratio computation.
+  For \texttt{bev\_embed} the two methods agree ($0.890$ cross-city on both);
+  for \texttt{img\_feat} they differ (6-cam: $0.424$; 8${\times}$8: $0.693$).
+  \emph{Do not compare entries across the two cosine columns for \texttt{img\_feat}.}
+  Method-consistent cosine distance ratios:
+  \texttt{img\_feat} $1.098{\times}$ (95\,\%\,CI $[1.064,\ 1.135]$);
+  \texttt{bev\_embed} $1.133{\times}$ (95\,\%\,CI $[1.101,\ 1.167]$); both $p{<}0.001$.
   Debiased CKA (Kornblith et al.~\citeyear{kornblith2019cka}) after PCA-100\,D.
-  $^{\dagger}$2000 bootstrap iterations, 80\,\% subsampling without replacement.}
+  $^{\dagger}$CKA CIs: 2000 bootstrap iterations, 80\,\% subsampling without replacement.}
 \label{tab:drift}
 \setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}lccccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-Comparison & Cos.\,$\mu$ & Cos.\,dist & CKA (debiased) & 95\,\%\,CI$^{\dagger}$ \\
+Comparison & Cos$_{6\mathrm{c}}$ & Cos$_{8{\times}8}$ & CKA (debiased) & 95\,\%\,CI$^{\dagger}$ \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{After FPN (\texttt{img\_feat})}} \\
-\quad Cross-city Boston$\to$Singapore & 0.424 & 0.576 & 0.003 & $[-0.001,\ 0.007]$ \\
-\quad Within-Boston (reference)       & $0.721^{\ddagger}$ & $0.279^{\ddagger}$ & 0.001 & $[-0.006,\ 0.009]$ \\
+\quad Cross-city Boston$\to$Singapore & 0.424 & 0.693 & 0.003 & $[-0.001,\ 0.007]$ \\
+\quad Within-Boston (reference)       & ---   & 0.721 & 0.001 & $[-0.006,\ 0.009]$ \\
 \midrule
 \multicolumn{5}{@{}l}{\textit{After BEV encoder (\texttt{bev\_embed})}} \\
-\quad Cross-city Boston$\to$Singapore & 0.890 & 0.110 & 0.009 & $[\ 0.004,\ 0.014]$ \\
-\quad Within-Boston (reference)       & 0.903 & 0.097 & $-$0.003 & $[-0.010,\ 0.003]$ \\
+\quad Cross-city Boston$\to$Singapore & 0.890 & 0.890 & 0.009 & $[\ 0.004,\ 0.014]$ \\
+\quad Within-Boston (reference)       & ---   & 0.903 & $-$0.003 & $[-0.010,\ 0.003]$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -402,11 +406,16 @@ This framing measures how much of the directional alignment gap is closed; it do
 claim the BEV encoder closes $81\%$ of the structural domain gap.
 \textbf{Cosine distance} ($1 -$ cosine) at the BEV encoder output is $0.110$ for
 cross-city pairs vs.\ $0.097$ for within-Boston pairs --- a ratio of $1.133\times$
-(95\,\% CI $[1.101,\ 1.167]$, permutation $p < 0.001$; both computed with the
-same CAM\_FRONT 8$\times$8 pooled extraction, 2000 bootstrap iterations).
+(95\,\% CI $[1.101,\ 1.167]$, $p < 0.001$; both computed from the same
+CAM\_FRONT 8$\times$8 pooled extraction, 2000 bootstrap iterations).
+The $p$-value is from a two-sample permutation test: the 500 cross-city and 250
+within-Boston cosine distance values were pooled ($n{=}750$), group labels
+shuffled 10{,}000 times, and the fraction of permutations yielding a cross-minus-within
+mean difference $\geq$ the observed $0.013$ was recorded; this fraction was $0$ in
+both layers ($p < 0.001$).
 City-level separation is therefore confirmed in the original high-dimensional feature
-space by a metric defined in the original space and statistically characterized,
-without relying on t-SNE projection distances.
+space by a statistically characterized metric, without relying on t-SNE projection
+distances.
 \textbf{Debiased CKA} is near zero in all comparison types:
 cross-city \texttt{img\_feat}: $0.003$ (CI includes zero);
 within-Boston \texttt{img\_feat}: $0.001$ (CI includes zero);
@@ -723,7 +732,8 @@ The four failures define the design space for any successful frozen-adapter appr
 
   \item \textbf{The BEV encoder normalizes appearance but not structural geometry.}
     The \texttt{bev\_embed} cosine distance ratio ($1.133\times$, 95\,\% CI $[1.101,\
-    1.167]$, $p < 0.001$) and debiased CKA of $0.009$ (95\,\% CI $[0.004,\ 0.014]$)
+    1.167]$, two-sample permutation $p < 0.001$; see \cref{sec:repr} for procedure)
+    and debiased CKA of $0.009$ (95\,\% CI $[0.004,\ 0.014]$)
     both confirm that city-level structural separation persists in the original
     high-dimensional feature space despite $81\%$ cosine normalization toward unity.
     This structural separation is the proximate cause of the detection gap and is the
