@@ -378,9 +378,11 @@ likely no larger than reported here.
   For \texttt{bev\_embed} the two methods agree ($0.890$ cross-city on both);
   for \texttt{img\_feat} they differ (6-cam: $0.424$; 8${\times}$8: $0.693$).
   \emph{Do not compare entries across the two cosine columns for \texttt{img\_feat}.}
-  Method-consistent cosine distance ratios:
-  \texttt{img\_feat} $1.098{\times}$ (95\,\%\,CI $[1.064,\ 1.135]$);
-  \texttt{bev\_embed} $1.133{\times}$ (95\,\%\,CI $[1.101,\ 1.167]$); both $p{<}0.001$.
+  Cos$_{8{\times}8}$ distance ratio (\texttt{img\_feat}):
+  $(1{-}0.693)/(1{-}0.721) = 0.307/0.279 = 1.098{\times}$ (95\,\%\,CI $[1.064,\ 1.135]$).
+  Cos$_{8{\times}8}$ distance ratio (\texttt{bev\_embed}):
+  $(1{-}0.890)/(1{-}0.903) = 0.110/0.097 = 1.133{\times}$ (95\,\%\,CI $[1.101,\ 1.167]$).
+  Both $p{<}0.001$ (two-sample permutation test, 10{,}000 iterations, group sizes maintained).
   Debiased CKA (Kornblith et al.~\citeyear{kornblith2019cka}) after PCA-100\,D.
   $^{\dagger}$CKA CIs: 2000 bootstrap iterations, 80\,\% subsampling without replacement.}
 \label{tab:drift}
@@ -409,9 +411,11 @@ cross-city pairs vs.\ $0.097$ for within-Boston pairs --- a ratio of $1.133\time
 (95\,\% CI $[1.101,\ 1.167]$, $p < 0.001$; both computed from the same
 CAM\_FRONT 8$\times$8 pooled extraction, 2000 bootstrap iterations).
 The $p$-value is from a two-sample permutation test: the 500 cross-city and 250
-within-Boston cosine distance values were pooled ($n{=}750$), group labels
-shuffled 10{,}000 times, and the fraction of permutations yielding a cross-minus-within
-mean difference $\geq$ the observed $0.013$ was recorded; this fraction was $0$ in
+within-Boston cosine distance values were pooled ($n{=}750$); in each of 10{,}000
+permutations, exactly 500 observations were drawn without replacement and assigned to
+the ``cross-city'' group (maintaining the original group sizes of 500 and 250), and
+the cross-minus-within mean distance difference was recomputed; the fraction of
+permutations yielding a difference $\geq$ the observed $0.013$ was $0$ in
 both layers ($p < 0.001$).
 City-level separation is therefore confirmed in the original high-dimensional feature
 space by a statistically characterized metric, without relying on t-SNE projection
