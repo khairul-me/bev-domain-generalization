@@ -1,0 +1,2 @@
+{"base_lr": 0.0002, "lr": 2e-05, "data_time": 1.5721831798553467, "grad_norm": 0.0, "loss": 0.0, "loss_dummy": 0.0, "time": 193.75836017131806, "epoch": 1, "iter": 10, "memory": 32168, "step": 10}
+{"base_lr": 0.0002, "lr": 2e-05, "data_time": 1.549588680267334, "grad_norm": 0.0, "loss": 0.0, "loss_dummy": 0.0, "time": 224.32935817241668, "epoch": 1, "iter": 20, "memory": 32518, "step": 20}

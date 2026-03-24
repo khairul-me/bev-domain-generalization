@@ -1,0 +1,62 @@
+{
+  "car": {
+    "boston": 0.6209,
+    "singapore": 0.5888,
+    "abs_gap": -0.03210000000000002,
+    "rel_gap_pct": -5.169914640038656
+  },
+  "truck": {
+    "boston": 0.35645,
+    "singapore": 0.30932499999999996,
+    "abs_gap": -0.04712500000000003,
+    "rel_gap_pct": -13.220648057231035
+  },
+  "bus": {
+    "boston": 0.44745,
+    "singapore": 0.39917499999999995,
+    "abs_gap": -0.04827500000000007,
+    "rel_gap_pct": -10.788914962565665
+  },
+  "trailer": {
+    "boston": 0.1571,
+    "singapore": 0.0,
+    "abs_gap": -0.1571,
+    "rel_gap_pct": -100.0
+  },
+  "construction_vehicle": {
+    "boston": 0.1345,
+    "singapore": 0.106525,
+    "abs_gap": -0.027975000000000014,
+    "rel_gap_pct": -20.799256505576217
+  },
+  "pedestrian": {
+    "boston": 0.481525,
+    "singapore": 0.4921,
+    "abs_gap": 0.010575000000000001,
+    "rel_gap_pct": 2.1961476558849493
+  },
+  "motorcycle": {
+    "boston": 0.479225,
+    "singapore": 0.416025,
+    "abs_gap": -0.06320000000000003,
+    "rel_gap_pct": -13.187959726641981
+  },
+  "bicycle": {
+    "boston": 0.429075,
+    "singapore": 0.3518,
+    "abs_gap": -0.07727499999999998,
+    "rel_gap_pct": -18.009671968770025
+  },
+  "traffic_cone": {
+    "boston": 0.6174250000000001,
+    "singapore": 0.51,
+    "abs_gap": -0.1074250000000001,
+    "rel_gap_pct": -17.39887435720939
+  },
+  "barrier": {
+    "boston": 0.52635,
+    "singapore": 0.49225,
+    "abs_gap": -0.034099999999999964,
+    "rel_gap_pct": -6.4785788923719885
+  }
+}

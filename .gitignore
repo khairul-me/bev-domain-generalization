@@ -3,8 +3,10 @@ data/
 *.pth
 *.pkl
 *.log
+*.npz
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
 experiments/*/results_*.pkl
 wandb/
+checkpoints/

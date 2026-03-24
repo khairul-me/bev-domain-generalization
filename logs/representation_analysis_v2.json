@@ -1,0 +1,22 @@
+{
+  "n_pairs": 500,
+  "img_feat": {
+    "linear_cka": 0.114449,
+    "linear_cka_ci_95": [
+      0.132069,
+      0.144747
+    ],
+    "cosine_sim_mean": 0.423957,
+    "cosine_sim_std": 0.033136
+  },
+  "bev_embed": {
+    "linear_cka": 0.138755,
+    "linear_cka_ci_95": [
+      0.158992,
+      0.173951
+    ],
+    "cosine_sim_mean": 0.889941,
+    "cosine_sim_std": 0.019415
+  },
+  "gap_normalization_pct_by_bev_encoder": 2.74
+}

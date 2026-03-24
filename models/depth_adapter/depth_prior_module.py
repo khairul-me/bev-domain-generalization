@@ -16,13 +16,17 @@ Intrinsics Normalization (Step 7.4):
   This makes DAv2 features consistent across domains.
 """
 import sys
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import cv2
 
-sys.path.insert(0, 'E:/Auto_Image/Depth-Anything-V2')
+# Use central path config
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from config.paths import DAV2_ROOT
+sys.path.insert(0, DAV2_ROOT)
 
 # ── Canonical camera (nuScenes CAM_FRONT average) ───────────────────────────
 K_CANONICAL = np.array([

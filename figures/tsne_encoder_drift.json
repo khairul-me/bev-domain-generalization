@@ -1,0 +1,6 @@
+{
+  "cross_model_distance": 2.128710985183716,
+  "within_baseline_distance": 1.6423625946044922,
+  "drift_ratio": 1.296127285908549,
+  "interpretation": "calibration_decoupling"
+}

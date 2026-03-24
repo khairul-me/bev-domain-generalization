@@ -1,0 +1,94 @@
+{
+  "config": {
+    "samples_per_domain": 50,
+    "total_frames": 100,
+    "camera": "CAM_FRONT",
+    "encoder": "DAv2 ViT-S",
+    "input_size": 518,
+    "seed": 42
+  },
+  "counts": {
+    "boston_processed": 50,
+    "singapore_processed": 50
+  },
+  "aggregate": {
+    "boston": {
+      "log_std": {
+        "mean": 0.9999997425079346,
+        "std": 4.2740146332352756e-07
+      },
+      "grad_mean": {
+        "mean": 0.05349085427820682,
+        "std": 0.018161696590537266
+      },
+      "grad_p90": {
+        "mean": 0.017821408012881883,
+        "std": 0.015134575188342015
+      },
+      "edge_corr": {
+        "mean": 0.2276300046608325,
+        "std": 0.08509583594321654
+      },
+      "p95_over_p50": {
+        "mean": 5.724168300319425,
+        "std": 2.5112085722152764
+      },
+      "p50_over_p05": {
+        "mean": 796492.7266829215,
+        "std": 329481.75284538284
+      }
+    },
+    "singapore": {
+      "log_std": {
+        "mean": 0.9999996423721313,
+        "std": 3.572302833502697e-07
+      },
+      "grad_mean": {
+        "mean": 0.07716421946883202,
+        "std": 0.04425015597157939
+      },
+      "grad_p90": {
+        "mean": 0.039302031211555025,
+        "std": 0.024253149565716076
+      },
+      "edge_corr": {
+        "mean": 0.15151391952893575,
+        "std": 0.08186440077912019
+      },
+      "p95_over_p50": {
+        "mean": 4.068446124940565,
+        "std": 1.2737792975253606
+      },
+      "p50_over_p05": {
+        "mean": 531952.7447672692,
+        "std": 483722.15120307024
+      }
+    }
+  },
+  "comparison": {
+    "log_std": {
+      "delta_mean_sg_minus_boston": -1.0013580320489268e-07,
+      "cohens_d_sg_vs_boston": -0.093041603180657
+    },
+    "grad_mean": {
+      "delta_mean_sg_minus_boston": 0.023673365190625198,
+      "cohens_d_sg_vs_boston": 0.6928947665285986
+    },
+    "grad_p90": {
+      "delta_mean_sg_minus_boston": 0.02148062319867314,
+      "cohens_d_sg_vs_boston": 1.0519424141149691
+    },
+    "edge_corr": {
+      "delta_mean_sg_minus_boston": -0.07611608513189674,
+      "cohens_d_sg_vs_boston": -0.9024540478975744
+    },
+    "p95_over_p50": {
+      "delta_mean_sg_minus_boston": -1.6557221753788598,
+      "cohens_d_sg_vs_boston": -0.823218261743456
+    },
+    "p50_over_p05": {
+      "delta_mean_sg_minus_boston": -264539.9819156523,
+      "cohens_d_sg_vs_boston": -0.6327910385476097
+    }
+  }
+}

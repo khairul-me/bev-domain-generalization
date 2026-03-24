@@ -1,0 +1,80 @@
+{
+  "boston_summary": {
+    "mAP": 0.425,
+    "NDS": 0.5239,
+    "mATE": 0.6655,
+    "mASE": 0.2804,
+    "mAOE": 0.321,
+    "mAVE": 0.4614,
+    "mAAE": 0.1574
+  },
+  "singapore_summary": {
+    "mAP": 0.3666,
+    "NDS": 0.4314,
+    "mATE": 0.7258,
+    "mASE": 0.3538,
+    "mAOE": 0.4716,
+    "mAVE": 0.6146,
+    "mAAE": 0.3533
+  },
+  "bootstrap": {
+    "n_classes": 10,
+    "classes": [
+      "car",
+      "truck",
+      "bus",
+      "trailer",
+      "construction_vehicle",
+      "pedestrian",
+      "motorcycle",
+      "bicycle",
+      "traffic_cone",
+      "barrier"
+    ],
+    "boston_mAP_ci": [
+      0.425,
+      0.3196145625,
+      0.5173766875
+    ],
+    "singapore_mAP_ci": [
+      0.3666,
+      0.2491998125,
+      0.468250875
+    ],
+    "gap_ci": [
+      -0.05840000000000001,
+      -0.20748606249999998,
+      0.08845331250000003
+    ]
+  },
+  "significance": {
+    "paired_t_stat": 3.9453557207614898,
+    "paired_t_p": 0.003378410695389495,
+    "wilcoxon_W": 1.0,
+    "wilcoxon_p": 0.00390625
+  },
+  "boston_per_class": {
+    "car": 0.6209,
+    "truck": 0.35645,
+    "bus": 0.44745,
+    "trailer": 0.1571,
+    "construction_vehicle": 0.1345,
+    "pedestrian": 0.481525,
+    "motorcycle": 0.479225,
+    "bicycle": 0.429075,
+    "traffic_cone": 0.6174250000000001,
+    "barrier": 0.52635
+  },
+  "singapore_per_class": {
+    "car": 0.5888,
+    "truck": 0.30932499999999996,
+    "bus": 0.39917499999999995,
+    "trailer": 0.0,
+    "construction_vehicle": 0.106525,
+    "pedestrian": 0.4921,
+    "motorcycle": 0.416025,
+    "bicycle": 0.3518,
+    "traffic_cone": 0.51,
+    "barrier": 0.49225
+  }
+}

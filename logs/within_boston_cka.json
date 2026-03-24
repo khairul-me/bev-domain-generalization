@@ -1,0 +1,43 @@
+{
+  "method": "debiased CKA PCA-100 within-Boston 250-pair cache split",
+  "n_pairs": 250,
+  "pca_components": 100,
+  "pca_variance_explained": {
+    "img_feat": 79.99,
+    "bev_embed": 75.77
+  },
+  "within_boston": {
+    "img_feat": {
+      "cka": 0.001039,
+      "ci_95": [
+        -0.006086,
+        0.008537
+      ],
+      "ci_valid": true
+    },
+    "bev_embed": {
+      "cka": -0.003457,
+      "ci_95": [
+        -0.010362,
+        0.003036
+      ],
+      "ci_valid": true
+    }
+  },
+  "cross_city": {
+    "img_feat": {
+      "cka": 0.003209,
+      "ci_95": [
+        -0.000918,
+        0.007371
+      ]
+    },
+    "bev_embed": {
+      "cka": 0.008541,
+      "ci_95": [
+        0.003566,
+        0.014008
+      ]
+    }
+  }
+}

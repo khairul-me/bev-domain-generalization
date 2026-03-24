@@ -8,10 +8,10 @@
 ## 1. nuScenes (Primary Training + In-Domain Evaluation)
 
 ### Download Status
-- [ ] v1.0-trainval metadata downloaded
-- [ ] Sensor data (sweeps + samples) downloaded (~300 GB)
-- [ ] nuscenes_infos_train.pkl generated
-- [ ] nuscenes_infos_val.pkl generated
+- [x] v1.0-trainval metadata downloaded
+- [x] Sensor data: samples complete (368,594 keyframe images); sweeps partial (171K camera sweeps missing—**not used by BEVFormer**)
+- [ ] nuscenes_infos_temporal_train.pkl generated
+- [ ] nuscenes_infos_temporal_val.pkl generated
 
 ### Dataset Properties
 | Property | Value |
@@ -75,10 +75,10 @@ python tools/create_data.py nuscenes \
 ## 2. KITTI 3D Object Detection (Cross-Domain Evaluation)
 
 ### Download Status
-- [ ] Left color images downloaded (12 GB)
-- [ ] Velodyne point clouds downloaded (29 GB)
-- [ ] Camera calibration downloaded
-- [ ] Training labels downloaded
+- [x] Left color images downloaded (12 GB)
+- [x] Velodyne point clouds downloaded (29 GB)
+- [x] Camera calibration downloaded
+- [x] Training labels downloaded
 - [ ] kitti_infos_train.pkl generated
 - [ ] kitti_infos_val.pkl generated
 

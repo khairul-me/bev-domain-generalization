@@ -1,0 +1,30 @@
+{
+  "method": "PCA-100 + debiased HSIC estimator (Kornblith 2019 supp.)",
+  "n_pairs": 500,
+  "pca_components": 100,
+  "pca_variance_explained": {
+    "img_feat": 70.55,
+    "bev_embed": 68.1
+  },
+  "img_feat": {
+    "linear_cka_raw_16384d_biased": 0.114449,
+    "linear_cka_pca100d_biased": 0.059076,
+    "linear_cka_pca100d_debiased": 0.003209,
+    "linear_cka_ci_95": [
+      -0.000918,
+      0.007371
+    ],
+    "ci_valid": true
+  },
+  "bev_embed": {
+    "linear_cka_raw_16384d_biased": 0.138755,
+    "linear_cka_pca100d_biased": 0.068071,
+    "linear_cka_pca100d_debiased": 0.008541,
+    "linear_cka_ci_95": [
+      0.003566,
+      0.014008
+    ],
+    "ci_valid": true
+  },
+  "gap_normalization_pct_by_bev_encoder_cka_pca": 0.53
+}

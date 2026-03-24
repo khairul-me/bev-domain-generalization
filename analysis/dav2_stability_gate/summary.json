@@ -1,0 +1,66 @@
+{
+  "config": {
+    "samples_per_domain": 50,
+    "min_singapore_night": 25,
+    "input_size": 518,
+    "seed": 42,
+    "camera": "CAM_FRONT",
+    "model": "Depth-Anything-V2 ViT-S (frozen)"
+  },
+  "counts": {
+    "boston_candidates": 3090,
+    "singapore_candidates": 2929,
+    "singapore_night_candidates": 602,
+    "boston_processed": 50,
+    "singapore_processed": 50,
+    "singapore_night_processed": 25,
+    "pair_count": 10
+  },
+  "artifacts": {
+    "hist_depth": "E:/bev_research/analysis/dav2_stability_gate\\hist_depth_boston_vs_singapore.png",
+    "hist_logdepth": "E:/bev_research/analysis/dav2_stability_gate\\hist_logdepth_boston_vs_singapore.png",
+    "pairs_dir": "E:/bev_research/analysis/dav2_stability_gate\\pairs",
+    "pairs": [
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_01.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_02.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_03.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_04.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_05.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_06.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_07.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_08.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_09.png",
+      "E:/bev_research/analysis/dav2_stability_gate\\pairs\\pair_10.png"
+    ]
+  },
+  "stats": {
+    "boston": {
+      "count": 72000000,
+      "mean": 2.8807743656564346,
+      "std": 2.8765240255839672,
+      "median": 1.835769534111023,
+      "p10": 9.999999974752427e-07,
+      "p90": 7.547616481781006
+    },
+    "singapore": {
+      "count": 72000000,
+      "mean": 2.758438112389157,
+      "std": 2.4185372023662697,
+      "median": 1.9518284797668457,
+      "p10": 0.15138002485036853,
+      "p90": 6.549478530883789
+    },
+    "singapore_night": {
+      "count": 36000000,
+      "mean": 2.6593968713859546,
+      "std": 2.334854953550169,
+      "median": 1.970654845237732,
+      "p10": 0.06581573337316518,
+      "p90": 6.176773548126221
+    },
+    "overlap_coeff": {
+      "boston_vs_singapore": 0.8359669166666667,
+      "boston_vs_singapore_night": 0.8240461666666667
+    }
+  }
+}
